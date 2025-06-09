@@ -1,0 +1,7 @@
+frontend:
+  image: youracr.azurecr.io/mern-frontend
+  tag: latest
+
+backend:
+  image: youracr.azurecr.io/mern-backend
+  tag: latest

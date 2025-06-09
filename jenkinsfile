@@ -1,0 +1,59 @@
+pipeline {
+  agent any
+
+  environment {
+    ACR = 'youracr.azurecr.io'
+    FRONTEND_IMAGE = "${ACR}/mern-frontend"
+    BACKEND_IMAGE = "${ACR}/mern-backend"
+    TAG = "${BUILD_NUMBER}"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        git url: 'https://github.com/your-user/mern-app.git'
+      }
+    }
+
+    stage('Trivy Scan') {
+      steps {
+        sh 'trivy fs . || true'  // Don't fail build
+      }
+    }
+
+    stage('Build Docker Images') {
+      steps {
+        sh '''
+          docker build -t $FRONTEND_IMAGE:$TAG ./client
+          docker build -t $BACKEND_IMAGE:$TAG ./server
+        '''
+      }
+    }
+
+    stage('Push to ACR') {
+      steps {
+        withCredentials([string(credentialsId: 'azure-sp', variable: 'AZURE_CREDENTIALS')]) {
+          sh '''
+            az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+            az acr login --name youracr
+            docker push $FRONTEND_IMAGE:$TAG
+            docker push $BACKEND_IMAGE:$TAG
+          '''
+        }
+      }
+    }
+
+    stage('Deploy to AKS using Helm') {
+      steps {
+        sh '''
+          az aks get-credentials --name your-aks-cluster --resource-group your-rg
+          helm upgrade --install myapp ./helm/myapp \
+            --set frontend.image=$FRONTEND_IMAGE \
+            --set frontend.tag=$TAG \
+            --set backend.image=$BACKEND_IMAGE \
+            --set backend.tag=$TAG
+        '''
+      }
+    }
+  }
+}
