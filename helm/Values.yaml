@@ -1,5 +1,5 @@
 backend:
-  image: ghcr.io/akiranb/mern-backend-demo:latest # <-- Replace with your Docker Hub image if you have one
+  image: nimsara2000/mern-backend:latest # <-- Replace with your Docker Hub image if you have one
   replicaCount: 1
   port: 5000
   env:
@@ -7,7 +7,7 @@ backend:
     CONNECTION_STRING: "mongodb://mongo:27017/foodRecipe"
 
 frontend:
-  image: ghcr.io/akiranb/mern-frontend-demo:latest # <-- Replace with your Docker Hub image if you have one
+  image: nimsara/mern-frontend:latest # <-- Replace with your Docker Hub image if you have one
   replicaCount: 1
   port: 80
 

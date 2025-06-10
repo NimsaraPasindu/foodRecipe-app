@@ -81,7 +81,7 @@ pipeline {
           echo "Deploying application to AKS via Helm..."
           # az aks get-credentials is NOT needed here again as it was done in the previous stage.
           # Helm will automatically use the kubeconfig file written by the previous 'az aks get-credentials' command.
-          helm upgrade --install myapp ./helm/myapp \\
+          helm upgrade --install myapp ./helm \\
             --set frontend.image.repository=$FRONTEND_IMAGE \\
             --set frontend.image.tag=$TAG \\
             --set backend.image.repository=$BACKEND_IMAGE \\
