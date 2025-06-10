@@ -6,6 +6,11 @@ pipeline {
     FRONTEND_IMAGE = "${DOCKER_USER}/mern-frontend"
     BACKEND_IMAGE = "${DOCKER_USER}/mern-backend"
     TAG = "${BUILD_NUMBER}"
+    AZURE_CREDENTIAL_ID = 'azure-mern-sp'
+    AZURE_SUBSCRIPTION_ID = '037b1f82-0daa-4bf7-9b49-9fa707fac82d'
+    AZURE_CLIENT_ID = '8fd8f426-4ed5-43bb-8250-d4d0b5d60d33'
+    AZURE_CLIENT_SECRET = 'loP8Q~Qgy-C-kF4R4zABCwzinvcnhUBPZW4OpcG6'
+    AZURE_TENANT_ID = 'aa232db2-7a78-4414-a529-33db9124cba7'
   }
 
   stages {
@@ -29,6 +34,35 @@ pipeline {
         '''
       }
     }
+
+     stages {
+        stage('Azure Login and Get AKS Credentials') {
+            steps {
+                script {
+                    // Use the withCredentials block to securely expose the Service Principal details.
+                    // The 'azureServicePrincipal' binding automatically sets:
+                    // AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID as environment variables.
+                    withCredentials([azureServicePrincipal(credentialsId: "${AZURE_CREDENTIAL_ID}")]) {
+                        sh '''
+                            echo "Logging into Azure using Service Principal..."
+                            # Authenticate Azure CLI using the Service Principal
+                            az login --service-principal --username "$AZURE_CLIENT_ID" --password "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID"
+
+                            echo "Setting active Azure subscription..."
+                            # Set the correct Azure subscription (important if the SP has access to multiple subscriptions)
+                            az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+                            echo "Getting AKS credentials for mern-app in foodRecipe resource group..."
+                            # Get AKS credentials. --overwrite-existing is useful in CI/CD to ensure fresh credentials.
+                            # This command will write the kubeconfig to ~/.kube/config by default,
+                            # which Helm and kubectl will automatically use.
+                            az aks get-credentials --name mern-app --resource-group foodRecipe --overwrite-existing
+                        '''
+                    }
+                }
+            }
+        }
+
 
     stage('Login to Docker Hub & Push Images') {
       steps {
