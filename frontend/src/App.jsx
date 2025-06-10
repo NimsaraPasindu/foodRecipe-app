@@ -10,9 +10,12 @@ import RecipeDetails from './pages/RecipeDetails'
 import './index.css'
 
 
+axios.defaults.baseURL = '/api';
+
+
 const getAllRecipes=async()=>{
   let allRecipes=[]
-  await axios.get('http://localhost:5000/recipe').then(res=>{
+  await axios.get('/recipe').then(res=>{
     allRecipes=res.data
   })
   return allRecipes
@@ -30,10 +33,10 @@ const getFavRecipes=()=>{
 
 const getRecipe=async({params})=>{
   let recipe;
-  await axios.get(`http://localhost:5000/recipe/${params.id}`)
+  await axios.get(`/recipe/${params.id}`)
   .then(res=>recipe=res.data)
 
-  await axios.get(`http://localhost:5000/user/${recipe.createdBy}`)
+  await axios.get(`/user/${recipe.createdBy}`)
   .then(res=>{
     recipe={...recipe,email:res.data.email}
   })
