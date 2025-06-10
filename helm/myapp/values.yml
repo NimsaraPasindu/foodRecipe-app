@@ -1,7 +1,0 @@
-frontend:
-  image: nimsara2000/mern-frontend
-  tag: latest
-
-backend:
-  image: nimsara2000/mern-backend
-  tag: latest

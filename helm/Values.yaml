@@ -1,0 +1,17 @@
+backend:
+  image: ghcr.io/akiranb/mern-backend-demo:latest # <-- Replace with your Docker Hub image if you have one
+  replicaCount: 1
+  port: 5000
+  env:
+    SECRET_KEY: "KIRTI12345"
+    CONNECTION_STRING: "mongodb://mongo:27017/foodRecipe"
+
+frontend:
+  image: ghcr.io/akiranb/mern-frontend-demo:latest # <-- Replace with your Docker Hub image if you have one
+  replicaCount: 1
+  port: 80
+
+mongo:
+   image: mongo:6
+   replicaCount: 1
+   port: 27017

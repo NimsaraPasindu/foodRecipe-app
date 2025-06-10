@@ -1,13 +1,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: mern-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: foodrecipe-ingress
 spec:
+  ingressClassName: nginx   # ✅ Use this instead of the old annotation
   rules:
-    - host: yourdomain.com
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix

@@ -14,6 +14,11 @@ spec:
     spec:
       containers:
         - name: backend
-          image: "{{ .Values.backend.image }}:{{ .Values.backend.tag }}"
+          image: docker.io/nimsara2000/mern-backend:latest
           ports:
             - containerPort: 5000
+          env:
+            - name: SECRET_KEY
+              value: "KIRTI12345"
+            - name: CONNECTION_STRING
+              value: "mongodb://mongo:27017/foodRecipe"
