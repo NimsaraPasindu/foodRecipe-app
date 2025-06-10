@@ -2,40 +2,40 @@ pipeline {
   agent any
 
   environment {
-    ACR = 'youracr.azurecr.io'
-    FRONTEND_IMAGE = "${ACR}/mern-frontend"
-    BACKEND_IMAGE = "${ACR}/mern-backend"
+    DOCKER_USER = "nimsara2000"
+    FRONTEND_IMAGE = "${DOCKER_USER}/mern-frontend"
+    BACKEND_IMAGE = "${DOCKER_USER}/mern-backend"
     TAG = "${BUILD_NUMBER}"
   }
 
   stages {
     stage('Checkout') {
       steps {
-        git url: 'https://github.com/your-user/mern-app.git'
+        git url: 'https://github.com/NimsaraPasindu/foodRecipe-app.git' 
       }
     }
 
     stage('Trivy Scan') {
       steps {
-        sh 'trivy fs . || true'  // Don't fail build
+        sh 'trivy fs . || true' // don't fail build if vulnerabilities
       }
     }
 
     stage('Build Docker Images') {
       steps {
         sh '''
-          docker build -t $FRONTEND_IMAGE:$TAG ./client
-          docker build -t $BACKEND_IMAGE:$TAG ./server
+          docker build -t $FRONTEND_IMAGE:$TAG ./frontend
+          docker build -t $BACKEND_IMAGE:$TAG ./backend
         '''
       }
     }
 
-    stage('Push to ACR') {
+    stage('Login to Docker Hub & Push Images') {
       steps {
-        withCredentials([string(credentialsId: 'azure-sp', variable: 'AZURE_CREDENTIALS')]) {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
           sh '''
-            az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-            az acr login --name youracr
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
             docker push $FRONTEND_IMAGE:$TAG
             docker push $BACKEND_IMAGE:$TAG
           '''
@@ -43,15 +43,16 @@ pipeline {
       }
     }
 
-    stage('Deploy to AKS using Helm') {
+    stage('Deploy to AKS via Helm') {
       steps {
         sh '''
-          az aks get-credentials --name your-aks-cluster --resource-group your-rg
+          az aks get-credentials --name mern-app --resource-group foodRecipe
+
           helm upgrade --install myapp ./helm/myapp \
-            --set frontend.image=$FRONTEND_IMAGE \
-            --set frontend.tag=$TAG \
-            --set backend.image=$BACKEND_IMAGE \
-            --set backend.tag=$TAG
+            --set frontend.image.repository=$FRONTEND_IMAGE \
+            --set frontend.image.tag=$TAG \
+            --set backend.image.repository=$BACKEND_IMAGE \
+            --set backend.image.tag=$TAG
         '''
       }
     }
