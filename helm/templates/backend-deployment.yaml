@@ -16,7 +16,7 @@ spec:
         - name: backend
           image: {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default "latest" }}
           ports:
-            - containerPort: 5000
+            - containerPort: 3000
           env:
             - name: SECRET_KEY
               value: "KIRTI12345"
