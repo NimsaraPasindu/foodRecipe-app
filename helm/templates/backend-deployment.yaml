@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: docker.io/nimsara2000/mern-backend:latest
+          image: {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default "latest" }}
           ports:
             - containerPort: 5000
           env:
