@@ -24,7 +24,7 @@ spec:
 
           # Route for frontend React app (no rewrite!)
           - path: /(.*)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: frontend
