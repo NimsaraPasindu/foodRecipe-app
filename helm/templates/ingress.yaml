@@ -7,13 +7,12 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          # Route for backend API (with rewrite)
+          # Backend API with rewrite
           - path: /api(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
@@ -21,10 +20,9 @@ spec:
                 name: backend
                 port:
                   number: 5000
-
-          # Route for frontend React app (no rewrite!)
-          - path: /(.*)
-            pathType: ImplementationSpecific
+          # Frontend without rewrite
+          - path: /
+            pathType: Prefix
             backend:
               service:
                 name: frontend
