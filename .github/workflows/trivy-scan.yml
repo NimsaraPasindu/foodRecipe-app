@@ -2,9 +2,9 @@ name: Trivy Security Scan
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   trivy:
@@ -19,6 +19,8 @@ jobs:
         with:
           scan-type: fs
           scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
 
       - name: Upload Trivy report to GitHub Security Dashboard
         uses: github/codeql-action/upload-sarif@v2
