@@ -11,8 +11,8 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static("public"))
 
-app.use("/",require("./routes/user"))
-app.use("/recipe",require("./routes/recipe"))
+app.use("/api",require("./routes/user"))
+app.use("/api/recipe",require("./routes/recipe"))
 
 app.listen(PORT,'0.0.0.0',(err)=>{
     console.log(`app is listening on port ${PORT}`)
