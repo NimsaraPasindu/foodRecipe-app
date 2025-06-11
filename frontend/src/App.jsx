@@ -10,7 +10,7 @@ import RecipeDetails from './pages/RecipeDetails'
 import './index.css'
 
 
-axios.defaults.baseURL = '/api';
+axios.defaults.baseURL = 'http://130.131.156.165:5000';
 
 
 const getAllRecipes=async()=>{
